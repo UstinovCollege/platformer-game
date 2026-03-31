@@ -1,13 +1,16 @@
 // Платформы уровня
+// Платформы уровня
 const platforms = [
     { x: 0, y: 550, width: 800, height: 50, color: '#4a4a6a' },    // Пол
-    { x: 100, y: 500, width: 150, height: 20, color: '#6a6a8a' },  // Платформа 1 (изменена)
-    { x: 350, y: 400, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 2
-    { x: 550, y: 330, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 3
-    { x: 200, y: 260, width: 150, height: 20, color: '#6a6a8a' },  // Платформа 4
-    { x: 50, y: 180, width: 100, height: 20, color: '#6a6a8a' },   // Платформа 5
+    { x: 50, y: 500, width: 120, height: 20, color: '#6a6a8a' },   // Платформа 1 (слева внизу)
+    { x: 350, y: 470, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 2 (центр)
+    { x: 650, y: 440, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 3 (справа)
+    { x: 200, y: 380, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 4 (слева выше)
+    { x: 500, y: 320, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 5 (центр выше)
+    { x: 50, y: 250, width: 150, height: 20, color: '#6a6a8a' },   // Платформа 6 (слева)
+    { x: 400, y: 180, width: 150, height: 20, color: '#6a6a8a' },  // Платформа 7 (центр высоко)
+    { x: 650, y: 120, width: 120, height: 20, color: '#2ecc71' }   // Безопасная зона (справа высоко)
 ];
-
 
 // Звёзды для сбора
 let stars = [
@@ -16,12 +19,10 @@ let stars = [
     { x: 600, y: 290, width: 20, height: 20, collected: false },
     { x: 250, y: 220, width: 20, height: 20, collected: false },
     { x: 90, y: 140, width: 20, height: 20, collected: false },
+    { x: 700, y: 450, width: 20, height: 20, collected: false },  // Добавленная звезда
+    { x: 500, y: 200, width: 20, height: 20, collected: false }   // Добавленная звезда
 ];
 
-stars.push(
-    { x: 700, y: 450, width: 20, height: 20, collected: false },
-    { x: 500, y: 200, width: 20, height: 20, collected: false },
-);
 // Портал (финиш)
 const portal = {
     x: 700,
@@ -37,7 +38,6 @@ function drawPlatforms(ctx) {
         ctx.fillStyle = platform.color;
         ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
         
-        // Декоративная обводка
         ctx.strokeStyle = '#8a8aaa';
         ctx.lineWidth = 2;
         ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
@@ -48,13 +48,11 @@ function drawPlatforms(ctx) {
 function drawStars(ctx) {
     stars.forEach(star => {
         if (!star.collected) {
-            // Рисуем звезду как жёлтый круг
             ctx.fillStyle = '#f1c40f';
             ctx.beginPath();
             ctx.arc(star.x + 10, star.y + 10, 10, 0, Math.PI * 2);
             ctx.fill();
             
-            // Блеск
             ctx.fillStyle = '#fff';
             ctx.beginPath();
             ctx.arc(star.x + 7, star.y + 7, 3, 0, Math.PI * 2);
@@ -68,7 +66,6 @@ function drawPortal(ctx) {
     ctx.fillStyle = portal.color;
     ctx.fillRect(portal.x, portal.y, portal.width, portal.height);
     
-    // Эффект свечения
     ctx.strokeStyle = '#bb8fce';
     ctx.lineWidth = 3;
     ctx.strokeRect(portal.x, portal.y, portal.width, portal.height);

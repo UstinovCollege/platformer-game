@@ -8,7 +8,10 @@ const player = {
     gravity: 0.5,
     jumpStrength: -10,
     speed: 5,
-    onGround: false
+    onGround: false,
+    lives: 2,
+    invincible: false,
+    invincibleTime: 0
 };
 
 const keys = {
@@ -34,25 +37,20 @@ function initPlayerInput() {
 
 // Обновление состояния игрока
 function updatePlayer(platforms) {
-    // Движение влево/вправо
     if (keys.left) player.x -= player.speed;
     if (keys.right) player.x += player.speed;
     
-    // Прыжок
     if (keys.up && player.onGround) {
         player.velocityY = player.jumpStrength;
         player.onGround = false;
     }
     
-    // Гравитация
     player.velocityY += player.gravity;
     player.y += player.velocityY;
     
-    // Границы экрана
     if (player.x < 0) player.x = 0;
     if (player.x + player.width > 800) player.x = 800 - player.width;
     
-    // Коллизия с платформами
     player.onGround = false;
     platforms.forEach(platform => {
         if (
@@ -68,7 +66,6 @@ function updatePlayer(platforms) {
         }
     });
     
-    // Пол (если упал ниже всех платформ)
     if (player.y + player.height > 600) {
         player.y = 600 - player.height;
         player.velocityY = 0;
@@ -81,16 +78,49 @@ function drawPlayer(ctx) {
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x, player.y, player.width, player.height);
     
-    // Глаза
     ctx.fillStyle = '#000';
     ctx.fillRect(player.x + 8, player.y + 8, 4, 4);
     ctx.fillRect(player.x + 20, player.y + 8, 4, 4);
 }
 
-// Сброс игрока (для рестарта)
+// Получение урона
+function playerTakeDamage() {
+    if (player.invincible) return;
+    
+    player.lives--;
+    updateLivesDisplay();
+    
+    if (player.lives <= 0) {
+        endGame();  // ← вызываем endGame() из main.js
+    } else {
+        player.invincible = true;
+        player.invincibleTime = Date.now() + 2000;
+        player.velocityY = -5;
+    }
+}
+
+// Обновление отображения жизней
+function updateLivesDisplay() {
+    const livesElement = document.getElementById('lives-display');
+    if (livesElement) {
+        livesElement.textContent = `❤️ ${player.lives}`;
+    }
+}
+
+// Проверка неуязвимости
+function updateInvincibility() {
+    if (player.invincible && Date.now() > player.invincibleTime) {
+        player.invincible = false;
+    }
+}
+
+// Сброс игрока
 function resetPlayer() {
     player.x = 100;
     player.y = 100;
     player.velocityY = 0;
     player.onGround = false;
+    player.lives = 5;
+    player.invincible = false;
+    updateLivesDisplay();
 }
