@@ -6,15 +6,90 @@ const ctx = canvas.getContext('2d');
 const gameOverScreen = document.getElementById('game-over-screen');
 const winScreen = document.getElementById('win-screen');
 const restartButton = document.getElementById('restart-button');
+const audioToggle = document.getElementById('audio-toggle');
 
 // Состояние игры
 let score = 0;
 let isGameWon = false;
 let isGameOver = false;
 
+// ============================================
+// 🔊 ЗВУКОВАЯ СИСТЕМА
+// ============================================
+
+const audio = {
+    enabled: true,
+    sounds: {
+        jump: null,
+        collect: null,
+        hurt: null,
+        win: null
+    }
+};
+
+function initAudio() {
+    // Создаём звуки
+    audio.sounds.jump = new Audio();
+    audio.sounds.jump.src = 'assets/sounds/jump.wav';
+    
+    audio.sounds.collect = new Audio();
+    audio.sounds.collect.src = 'assets/sounds/collect.wav';
+    
+    audio.sounds.hurt = new Audio();
+    audio.sounds.hurt.src = 'assets/sounds/hurt.wav';
+    
+    audio.sounds.win = new Audio();
+    audio.sounds.win.src = 'assets/sounds/win.wav';
+
+    audio.sounds.music = new Audio();
+    audio.sounds.music.src = 'assets/sounds/music.mp3';
+    audio.sounds.music.loop = true;      // Зацикливаем
+    audio.sounds.music.volume = 0.1;     // Громкость 10%
+    
+    // Запускаем музыку
+    if (audio.enabled) {
+        audio.sounds.music.play().catch(e => console.log('Музыка не загружена:', e)); 
+    }
+}
+
+function playSound(soundName) {
+    if (!audio.enabled) return;
+    
+    const sound = audio.sounds[soundName];
+    if (sound) {
+        const soundClone = sound.cloneNode();
+        soundClone.play().catch(e => console.log('Звук не загружен:', e));
+    }
+}
+
+function toggleAudio() {
+    audio.enabled = !audio.enabled;
+    
+    if (audio.enabled) {
+        // Включаем музыку
+        if (audio.sounds.music) {
+            audio.sounds.music.play().catch(e => console.log('Музыка не загружена:', e));
+        }
+    } else {
+        // Выключаем музыку
+        if (audio.sounds.music) {
+            audio.sounds.music.pause();
+        }
+    }
+    
+    if (audioToggle) {
+        audioToggle.textContent = audio.enabled ? '🔊' : '🔇';
+    }
+}
+
+// ============================================
+// 🎮 ОСНОВНЫЕ ФУНКЦИИ ИГРЫ
+// ============================================
+
 // Инициализация
 function init() {
     initPlayerInput();
+    initAudio();  // 🆕 Инициализируем звуки
     updateScoreDisplay();
     updateLivesDisplay();
     console.log('🎮 Игра запущена!');
@@ -39,6 +114,7 @@ function endGame() {
 function winGame() {
     isGameWon = true;
     winScreen.classList.remove('hidden');
+    playSound('win');  // 🆕 Звук победы
     console.log('🎉 ПОБЕДА! 🎉');
 }
 
@@ -110,6 +186,10 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+// ============================================
+// 🎮 ОБРАБОТЧИКИ СОБЫТИЙ
+// ============================================
+
 // Обработка рестарта по кнопке R
 document.addEventListener('keydown', (e) => {
     if (e.code === 'KeyR') {
@@ -124,6 +204,16 @@ if (restartButton) {
     });
 }
 
-// Запуск
+// Обработка кнопки звука
+if (audioToggle) {
+    audioToggle.addEventListener('click', () => {
+        toggleAudio();
+    });
+}
+
+// ============================================
+// 🚀 ЗАПУСК ИГРЫ
+// ============================================
+
 init();
 gameLoop();

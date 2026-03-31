@@ -11,11 +11,13 @@
         <canvas id="gameCanvas" width="800" height="600"></canvas>
         <div id="ui-overlay">
             <div id="score-display">⭐ 0</div>
-            <div id="lives-display">❤️ 3</div>
+            <div id="lives-display">❤️ 2</div>
+            <button id="audio-toggle" class="ui-button">🔊</button>
         </div>
         
-        <!-- Кнопка рестарта -->
         <button id="restart-button">🔄 Рестарт</button>
+        
+        <div id="level-title">Уровень 1: Первые звёзды</div>
         
         <div id="game-over-screen" class="hidden">
             <h1>💀 GAME OVER 💀</h1>
@@ -27,7 +29,6 @@
         </div>
     </div>
     
-    <!-- Подключаем скрипты по порядку -->
     <script src="js/player.js"></script>
     <script src="js/world.js"></script>
     <script src="js/enemies.js"></script>

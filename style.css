@@ -22,7 +22,8 @@ body {
 
 #gameCanvas {
     display: block;
-    background: linear-gradient(to bottom, #16213e, #1a1a2e);
+    background: url('assets/sprites/background.png') no-repeat center center;
+    background-size: cover;
 }
 
 #ui-overlay {
@@ -32,6 +33,7 @@ body {
     right: 10px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     color: #fff;
     font-size: 24px;
     font-weight: bold;
@@ -39,11 +41,65 @@ body {
     pointer-events: none;
 }
 
-#score-display,
+#score-display {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
 #lives-display {
     background: rgba(0, 0, 0, 0.5);
     padding: 8px 16px;
     border-radius: 20px;
+}
+
+.ui-button {
+    position: absolute;
+    top: 10px;
+    right: 80px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #fff;
+    pointer-events: auto;
+}
+
+.ui-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+#restart-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border: 2px solid #4a4a6a;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 20;
+    font-family: Arial, sans-serif;
+    pointer-events: auto;
+}
+
+#restart-button:hover {
+    background: rgba(74, 74, 106, 0.9);
+    transform: scale(1.05);
+    border-color: #8a8aaa;
+}
+
+#restart-button:active {
+    transform: scale(0.95);
 }
 
 #level-title {
@@ -57,6 +113,8 @@ body {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
     animation: fadeInOut 3s forwards;
     white-space: nowrap;
+    pointer-events: none;
+    z-index: 5;
 }
 
 @keyframes fadeInOut {
@@ -110,31 +168,4 @@ body {
 
 .hidden {
     display: none !important;
-}
-/* Кнопка рестарта */
-#restart-button {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    color: #fff;
-    border: 2px solid #4a4a6a;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 20;
-    font-family: Arial, sans-serif;
-}
-
-#restart-button:hover {
-    background: rgba(74, 74, 106, 0.9);
-    transform: scale(1.05);
-    border-color: #8a8aaa;
-}
-
-#restart-button:active {
-    transform: scale(0.95);
 }

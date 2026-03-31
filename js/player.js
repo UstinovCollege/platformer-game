@@ -20,6 +20,10 @@ const keys = {
     up: false
 };
 
+// Загрузка спрайта игрока (один спрайт, без анимации)
+const playerSprite = new Image();
+playerSprite.src = 'assets/sprites/player.png';
+
 // Инициализация управления
 function initPlayerInput() {
     document.addEventListener('keydown', (e) => {
@@ -43,6 +47,7 @@ function updatePlayer(platforms) {
     if (keys.up && player.onGround) {
         player.velocityY = player.jumpStrength;
         player.onGround = false;
+        if (typeof playSound === 'function') playSound('jump');
     }
     
     player.velocityY += player.gravity;
@@ -73,14 +78,30 @@ function updatePlayer(platforms) {
     }
 }
 
-// Отрисовка игрока
+// Отрисовка игрока (упрощённая, без анимации)
 function drawPlayer(ctx) {
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-    
-    ctx.fillStyle = '#000';
-    ctx.fillRect(player.x + 8, player.y + 8, 4, 4);
-    ctx.fillRect(player.x + 20, player.y + 8, 4, 4);
+    // Если спрайт загрузился — рисуем его
+    if (playerSprite.complete && playerSprite.naturalHeight !== 0) {
+        // Отражение спрайта при движении влево
+        ctx.save();
+        if (keys.left) {
+            ctx.translate(player.x + player.width, player.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(playerSprite, 0, 0, player.width, player.height);
+        } else {
+            ctx.drawImage(playerSprite, player.x, player.y, player.width, player.height);
+        }
+        ctx.restore();
+    } else {
+        // Fallback — квадрат (если спрайт не загрузился)
+        ctx.fillStyle = player.invincible ? 'rgba(0, 255, 136, 0.5)' : player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+        
+        // Глаза
+        ctx.fillStyle = '#000';
+        ctx.fillRect(player.x + 8, player.y + 8, 4, 4);
+        ctx.fillRect(player.x + 20, player.y + 8, 4, 4);
+    }
 }
 
 // Получение урона
@@ -89,9 +110,10 @@ function playerTakeDamage() {
     
     player.lives--;
     updateLivesDisplay();
+    if (typeof playSound === 'function') playSound('hurt');
     
     if (player.lives <= 0) {
-        endGame();  // ← вызываем endGame() из main.js
+        if (typeof endGame === 'function') endGame();
     } else {
         player.invincible = true;
         player.invincibleTime = Date.now() + 2000;
@@ -120,7 +142,7 @@ function resetPlayer() {
     player.y = 100;
     player.velocityY = 0;
     player.onGround = false;
-    player.lives = 5;
+    player.lives = 2;
     player.invincible = false;
     updateLivesDisplay();
 }
