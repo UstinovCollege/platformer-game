@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Платформер</title>
+    <title>Мой Платформер — Спринт 2</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
         <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui-overlay">
+            <div id="level-title">Уровень 1: Первые звёзды</div>
+            <div id="score-display">⭐ 0</div>
+        </div>
     </div>
     
+    <!-- Подключаем скрипты по порядку -->
+    <script src="js/player.js"></script>
+    <script src="js/world.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

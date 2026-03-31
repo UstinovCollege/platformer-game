@@ -1,139 +1,87 @@
+// Получаем доступ к холсту
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-const player = {
-    x: 100,
-    y: 100,
-    width: 32,
-    height: 32,
-    color: '#00ff88',
-    velocityY: 0,
-    gravity: 0.5,
-    jumpStrength: -10,
-    speed: 5,
-    onGround: false
-};
+// Счёт и состояние игры
+let score = 0;
+let gameWon = false;
 
-// Платформы
-const platforms = [
-    { x: 0, y: 550, width: 800, height: 50, color: '#4a4a6a' },    // Пол
-    { x: 200, y: 450, width: 150, height: 20, color: '#6a6a8a' },  // Платформа 1
-    { x: 450, y: 350, width: 150, height: 20, color: '#6a6a8a' },  // Платформа 2
-    { x: 100, y: 250, width: 100, height: 20, color: '#6a6a8a' },  // Платформа 3
-];
+// Инициализация
+function init() {
+    initPlayerInput();
+    updateScoreDisplay();
+    console.log('🎮 Игра запущена! Собирай все звёзды и иди к порталу!');
+}
 
-const keys = {
-    left: false,
-    right: false,
-    up: false
-};
-
-let isShiftPressed = false;
-
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-        keys.left = true;
-    }
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-        keys.right = true;
-    }
-    if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') {
-        keys.up = true;
-    }
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
-        isShiftPressed = true;
-    }
-});
-
-document.addEventListener('keyup', (e) => {
-    if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
-        keys.left = false;
-    }
-    if (e.code === 'ArrowRight' || e.code === 'KeyD') {
-        keys.right = false;
-    }
-    if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') {
-        keys.up = false;
-    }
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
-        isShiftPressed = false;
-    }
-});
-
-function update() {
-    if (keys.left) {
-        player.x -= player.speed;
-    }
-    if (keys.right) {
-        player.x += player.speed;
-    }
-    
-    // Супер-прыжок при зажатом Shift
-    if (keys.up && player.onGround) {
-        player.velocityY = isShiftPressed ? -20 : player.jumpStrength;
-        player.onGround = false;
-    }
-    
-    player.velocityY += player.gravity;
-    player.y += player.velocityY;
-    
-    if (player.x < 0) player.x = 0;
-    if (player.x + player.width > canvas.width) {
-        player.x = canvas.width - player.width;
-    }
-    
-    // Проверка коллизии с платформами
-    player.onGround = false;
-    platforms.forEach(platform => {
-        if (
-            player.x < platform.x + platform.width &&
-            player.x + player.width > platform.x &&
-            player.y + player.height > platform.y &&
-            player.y + player.height < platform.y + platform.height + 10 &&
-            player.velocityY >= 0
-        ) {
-            player.onGround = true;
-            player.velocityY = 0;
-            player.y = platform.y - player.height;
-        }
-    });
-    
-    // Пол (чтобы не падал бесконечно)
-    if (player.y + player.height > canvas.height) {
-        player.y = canvas.height - player.height;
-        player.velocityY = 0;
-        player.onGround = true;
+// Обновление счёта на экране
+function updateScoreDisplay() {
+    const scoreElement = document.getElementById('score-display');
+    if (scoreElement) {
+        scoreElement.textContent = `⭐ ${score}`;
     }
 }
 
-function draw() {
-    // След из квадратов (рисуем перед очисткой)
-    ctx.fillStyle = 'rgba(0, 255, 136, 0.1)';
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+// Обновление состояния игры
+function update() {
+    if (gameWon) return;
     
+    updatePlayer(platforms);
+    checkStarCollection();
+    
+    if (checkWin()) {
+        gameWon = true;
+        console.log('🎉 ПОБЕДА! 🎉');
+    }
+}
+
+// Отрисовка всего
+function draw() {
+    // Очищаем экран
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Радужный игрок (меняем цвет каждый кадр)
-    player.color = `hsl(${Date.now() % 360}, 100%, 50%)`;
+    // Рисуем мир
+    drawPlatforms(ctx);
+    drawStars(ctx);
+    drawPortal(ctx);
     
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+    // Рисуем игрока
+    drawPlayer(ctx);
     
-    ctx.fillStyle = '#000';
-    ctx.fillRect(player.x + 8, player.y + 8, 4, 4);
-    ctx.fillRect(player.x + 20, player.y + 8, 4, 4);
-    
-    // Рисуем платформы
-    platforms.forEach(platform => {
-        ctx.fillStyle = platform.color;
-        ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-    });
+    // Экран победы
+    if (gameWon) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#f1c40f';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('🎉 ПОБЕДА! 🎉', canvas.width / 2, canvas.height / 2 - 30);
+        
+        ctx.fillStyle = '#fff';
+        ctx.font = '24px Arial';
+        ctx.fillText(`Счёт: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+        ctx.fillText('Нажми R для рестарта', canvas.width / 2, canvas.height / 2 + 60);
+    }
 }
 
+// Игровой цикл
 function gameLoop() {
     update();
     draw();
     requestAnimationFrame(gameLoop);
 }
 
+// Обработка рестарта
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyR' && gameWon) {
+        gameWon = false;
+        score = 0;
+        resetPlayer();
+        resetWorld();
+        updateScoreDisplay();
+    }
+});
+
+// Запуск
+init();
 gameLoop();
