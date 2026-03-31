@@ -1,27 +1,15 @@
-// Платформы уровня
-// Платформы уровня
-const platforms = [
-    { x: 0, y: 550, width: 800, height: 50, color: '#4a4a6a' },    // Пол
-    { x: 50, y: 500, width: 120, height: 20, color: '#6a6a8a' },   // Платформа 1 (слева внизу)
-    { x: 350, y: 470, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 2 (центр)
-    { x: 650, y: 440, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 3 (справа)
-    { x: 200, y: 380, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 4 (слева выше)
-    { x: 500, y: 320, width: 120, height: 20, color: '#6a6a8a' },  // Платформа 5 (центр выше)
-    { x: 50, y: 250, width: 150, height: 20, color: '#6a6a8a' },   // Платформа 6 (слева)
-    { x: 400, y: 210, width: 150, height: 20, color: '#6a6a8a' },  // Платформа 7 (центр высоко)
-    { x: 650, y: 120, width: 120, height: 20, color: '#2ecc71' }   // Безопасная зона (справа высоко)
-];
-// Звёзды для сбора
-// Звёзды для сбора (подняты выше, чтобы не были внутри платформ)
-let stars = [
-    { x: 200, y: 410, width: 35, height: 35, collected: false },  // Над платформой 1 (y=430)
-    { x: 400, y: 340, width: 35, height: 35, collected: false },  // Над платформой 2 (y=360)
-    { x: 600, y: 290, width: 35, height: 35, collected: false },  // Над платформой 3 (y=290)
-    { x: 250, y: 200, width: 35, height: 35, collected: false },  // Над платформой 4 (y=220)
-    { x: 90, y: 120, width: 35, height: 35, collected: false },   // Над платформой 5 (y=140)
-    { x: 700, y: 390, width: 35, height: 35, collected: false },  // Над полом (y=450)
-    { x: 500, y: 90, width: 35, height: 35, collected: false }    // Над платформой 6 (y=200)
-];
+// ============================================
+// 🗺 МИР — Платформы, звёзды, портал, шипы
+// ============================================
+
+// Платформы (будут загружаться из уровней)
+let platforms = [];
+
+// Звёзды
+let stars = [];
+
+// Шипы
+let spikes = [];
 
 // Портал
 const portal = {
@@ -39,7 +27,13 @@ platformSprite.src = 'assets/sprites/platform.png';
 const starSprite = new Image();
 starSprite.src = 'assets/sprites/star.png';
 
-// Отрисовка платформ
+const spikeSprite = new Image();
+spikeSprite.src = 'assets/sprites/spike.png';
+
+// ============================================
+// 🖼 ОТРИСОВКА
+// ============================================
+
 function drawPlatforms(ctx) {
     platforms.forEach(platform => {
         if (platformSprite.complete && platformSprite.naturalHeight !== 0) {
@@ -59,7 +53,6 @@ function drawPlatforms(ctx) {
     });
 }
 
-// Отрисовка звёзд
 function drawStars(ctx) {
     stars.forEach(star => {
         if (!star.collected) {
@@ -68,14 +61,13 @@ function drawStars(ctx) {
             } else {
                 ctx.fillStyle = '#f1c40f';
                 ctx.beginPath();
-                ctx.arc(star.x + 10, star.y + 10, 10, 0, Math.PI * 2);
+                ctx.arc(star.x + star.width/2, star.y + star.height/2, star.width/2, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
     });
 }
 
-// Отрисовка портала
 function drawPortal(ctx) {
     ctx.fillStyle = portal.color;
     ctx.fillRect(portal.x, portal.y, portal.width, portal.height);
@@ -84,7 +76,33 @@ function drawPortal(ctx) {
     ctx.strokeRect(portal.x, portal.y, portal.width, portal.height);
 }
 
-// Проверка сбора звёзд
+function drawSpikes(ctx) {
+    spikes.forEach(spike => {
+        if (spikeSprite.complete && spikeSprite.naturalHeight !== 0) {
+            ctx.drawImage(spikeSprite, spike.x, spike.y, spike.width, spike.height);
+        } else {
+            // Рисуем треугольные шипы
+            ctx.fillStyle = '#ff4444';
+            const spikeCount = Math.floor(spike.width / 20);
+            for (let i = 0; i < spikeCount; i++) {
+                const spikeX = spike.x + i * 20;
+                ctx.beginPath();
+                ctx.moveTo(spikeX, spike.y + spike.height);
+                ctx.lineTo(spikeX + 10, spike.y);
+                ctx.lineTo(spikeX + 20, spike.y + spike.height);
+                ctx.fill();
+            }
+            ctx.strokeStyle = '#aa2222';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(spike.x, spike.y, spike.width, spike.height);
+        }
+    });
+}
+
+// ============================================
+// 🎯 ЛОГИКА ИГРЫ
+// ============================================
+
 function checkStarCollection() {
     stars.forEach(star => {
         if (!star.collected &&
@@ -95,12 +113,11 @@ function checkStarCollection() {
             star.collected = true;
             score += 100;
             updateScoreDisplay();
-            playSound('collect');  // Звук сбора звезды
+            if (typeof playSound === 'function') playSound('collect');
         }
     });
 }
 
-// Проверка победы
 function checkWin() {
     const allStarsCollected = stars.every(s => s.collected);
     
@@ -114,7 +131,20 @@ function checkWin() {
     return false;
 }
 
-// Сброс мира
+function checkSpikeCollision() {
+    for (let spike of spikes) {
+        if (
+            player.x < spike.x + spike.width &&
+            player.x + player.width > spike.x &&
+            player.y < spike.y + spike.height &&
+            player.y + player.height > spike.y
+        ) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function resetWorld() {
     stars.forEach(star => star.collected = false);
 }

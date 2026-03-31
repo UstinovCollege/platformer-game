@@ -3,35 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Платформер — Спринт 3</title>
+    <title>🎮 Супер Платформер</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
         <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- Главное меню -->
+        <div id="menu-screen" class="menu-screen">
+            <h1>🎮 СУПЕР ПЛАТФОРМЕР</h1>
+            <p class="subtitle">Приключение начинается!</p>
+            <button id="start-button" class="menu-button">▶️ НАЧАТЬ ИГРУ</button>
+            <p class="controls">Управление: Стрелки или WASD | Прыжок: Пробел | Рестарт: R</p>
+        </div>
+        
+        <!-- Название уровня -->
+        <div id="level-title" class="level-title hidden">Уровень 1</div>
+        
+        <!-- Интерфейс -->
         <div id="ui-overlay">
             <div id="score-display">⭐ 0</div>
-            <div id="lives-display">❤️ 2</div>
+            <div id="lives-display">❤️ 1</div>
             <button id="audio-toggle" class="ui-button">🔊</button>
         </div>
         
-        <button id="restart-button">🔄 Рестарт</button>
-        
-        <div id="level-title">Уровень 1: Первые звёзды</div>
-        
+        <!-- Экран проигрыша -->
         <div id="game-over-screen" class="hidden">
             <h1>💀 GAME OVER 💀</h1>
-            <p>Нажми R или кнопку рестарта</p>
+            <p>Нажми R для рестарта</p>
         </div>
+        
+        <!-- Экран победы -->
         <div id="win-screen" class="hidden">
             <h1>🎉 ПОБЕДА! 🎉</h1>
-            <p>Нажми R или кнопку рестарта</p>
+            <p>Нажми R для новой игры</p>
         </div>
+        
+        <!-- Кнопка рестарта -->
+        <button id="restart-button" class="restart-btn">🔄 Рестарт</button>
     </div>
     
+    <!-- Подключаем скрипты по порядку -->
     <script src="js/player.js"></script>
     <script src="js/world.js"></script>
     <script src="js/enemies.js"></script>
+    <script src="js/sounds.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/menu.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

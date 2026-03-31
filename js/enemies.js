@@ -1,27 +1,8 @@
-// Массив врагов
-let enemies = [
-    {
-        x: 300, y: 520, width: 32, height: 32,
-        color: '#e74c3c', speed: 2, direction: 1,
-        patrolStart: 250, patrolEnd: 450
-    },
-    {
-        x: 500, y: 300, width: 32, height: 32,
-        color: '#e74c3c', speed: 2, direction: 1,
-        patrolStart: 450, patrolEnd: 650
-    },
-    {
-        x: 150, y: 230, width: 32, height: 32,
-        color: '#e74c3c', speed: 1.5, direction: 1,
-        patrolStart: 100, patrolEnd: 300
-    }
-];
+let enemies = [];
 
-// Загрузка спрайта врага
 const enemySprite = new Image();
 enemySprite.src = 'assets/sprites/enemy.png';
 
-// Отрисовка врагов
 function drawEnemies(ctx) {
     enemies.forEach(enemy => {
         if (enemySprite.complete && enemySprite.naturalHeight !== 0) {
@@ -37,7 +18,6 @@ function drawEnemies(ctx) {
         } else {
             ctx.fillStyle = enemy.color;
             ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-            
             ctx.fillStyle = '#fff';
             ctx.fillRect(enemy.x + 6, enemy.y + 8, 8, 8);
             ctx.fillRect(enemy.x + 18, enemy.y + 8, 8, 8);
@@ -49,7 +29,6 @@ function drawEnemies(ctx) {
     });
 }
 
-// Обновление врагов
 function updateEnemies() {
     enemies.forEach(enemy => {
         enemy.x += enemy.speed * enemy.direction;
@@ -62,7 +41,6 @@ function updateEnemies() {
     });
 }
 
-// Проверка столкновения
 function checkEnemyCollision() {
     for (let enemy of enemies) {
         if (
@@ -77,19 +55,6 @@ function checkEnemyCollision() {
     return false;
 }
 
-// Сброс врагов
 function resetEnemies() {
-    enemies = [
-        { x: 300, y: 520, width: 32, height: 32, color: '#e74c3c', speed: 2, direction: 1, patrolStart: 250, patrolEnd: 450 },
-        { x: 500, y: 300, width: 32, height: 32, color: '#e74c3c', speed: 2, direction: 1, patrolStart: 450, patrolEnd: 650 },
-        { x: 150, y: 230, width: 32, height: 32, color: '#e74c3c', speed: 1.5, direction: 1, patrolStart: 100, patrolEnd: 300 }
-    ];
-}
-
-function addEnemy(x, y, patrolStart, patrolEnd, speed) {
-    enemies.push({
-        x, y, width: 32, height: 32,
-        color: '#e74c3c', speed, direction: 1,
-        patrolStart, patrolEnd
-    });
+    enemies = [];
 }

@@ -9,7 +9,7 @@ const player = {
     jumpStrength: -10,
     speed: 5,
     onGround: false,
-    lives: 2,
+    lives: 1,
     invincible: false,
     invincibleTime: 0
 };
@@ -20,11 +20,13 @@ const keys = {
     up: false
 };
 
-// Загрузка спрайта игрока (один спрайт, без анимации)
+// Загрузка спрайта игрока
 const playerSprite = new Image();
 playerSprite.src = 'assets/sprites/player.png';
 
-// Инициализация управления
+let walkFrame = 0;
+let walkTimer = 0;
+
 function initPlayerInput() {
     document.addEventListener('keydown', (e) => {
         if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
@@ -39,7 +41,6 @@ function initPlayerInput() {
     });
 }
 
-// Обновление состояния игрока
 function updatePlayer(platforms) {
     if (keys.left) player.x -= player.speed;
     if (keys.right) player.x += player.speed;
@@ -78,11 +79,8 @@ function updatePlayer(platforms) {
     }
 }
 
-// Отрисовка игрока (упрощённая, без анимации)
 function drawPlayer(ctx) {
-    // Если спрайт загрузился — рисуем его
     if (playerSprite.complete && playerSprite.naturalHeight !== 0) {
-        // Отражение спрайта при движении влево
         ctx.save();
         if (keys.left) {
             ctx.translate(player.x + player.width, player.y);
@@ -93,18 +91,14 @@ function drawPlayer(ctx) {
         }
         ctx.restore();
     } else {
-        // Fallback — квадрат (если спрайт не загрузился)
         ctx.fillStyle = player.invincible ? 'rgba(0, 255, 136, 0.5)' : player.color;
         ctx.fillRect(player.x, player.y, player.width, player.height);
-        
-        // Глаза
         ctx.fillStyle = '#000';
         ctx.fillRect(player.x + 8, player.y + 8, 4, 4);
         ctx.fillRect(player.x + 20, player.y + 8, 4, 4);
     }
 }
 
-// Получение урона
 function playerTakeDamage() {
     if (player.invincible) return;
     
@@ -113,7 +107,7 @@ function playerTakeDamage() {
     if (typeof playSound === 'function') playSound('hurt');
     
     if (player.lives <= 0) {
-        if (typeof endGame === 'function') endGame();
+        if (typeof gameOver === 'function') gameOver();
     } else {
         player.invincible = true;
         player.invincibleTime = Date.now() + 2000;
@@ -121,7 +115,6 @@ function playerTakeDamage() {
     }
 }
 
-// Обновление отображения жизней
 function updateLivesDisplay() {
     const livesElement = document.getElementById('lives-display');
     if (livesElement) {
@@ -129,20 +122,18 @@ function updateLivesDisplay() {
     }
 }
 
-// Проверка неуязвимости
 function updateInvincibility() {
     if (player.invincible && Date.now() > player.invincibleTime) {
         player.invincible = false;
     }
 }
 
-// Сброс игрока
 function resetPlayer() {
     player.x = 100;
     player.y = 100;
     player.velocityY = 0;
     player.onGround = false;
-    player.lives = 2;
+    player.lives = 1;
     player.invincible = false;
     updateLivesDisplay();
 }

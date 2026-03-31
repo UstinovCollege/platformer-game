@@ -1,53 +1,57 @@
-// ============================================
-
 const audio = {
-    sounds: {},
     enabled: true,
-    volume: 0.3
+    sounds: {
+        jump: null,
+        collect: null,
+        hurt: null,
+        win: null,
+        music: null
+    }
 };
 
-// Инициализация звуков
 function initAudio() {
-    audio.sounds = {
-        jump: new Audio('assets/sounds/jump.mp3'),
-        collect: new Audio('assets/sounds/collect.mp3'),
-        hurt: new Audio('assets/sounds/hurt.mp3'),
-        win: new Audio('assets/sounds/win.mp3')
-    };
+    audio.sounds.jump = new Audio();
+    audio.sounds.jump.src = 'assets/sounds/jump.wav';
     
-    // Настраиваем громкость
-    Object.values(audio.sounds).forEach(sound => {
-        sound.volume = audio.volume;
-    });
+    audio.sounds.collect = new Audio();
+    audio.sounds.collect.src = 'assets/sounds/collect.wav';
     
-    console.log('🔊 Аудио система инициализирована');
+    audio.sounds.hurt = new Audio();
+    audio.sounds.hurt.src = 'assets/sounds/hurt.wav';
+    
+    audio.sounds.win = new Audio();
+    audio.sounds.win.src = 'assets/sounds/win.wav';
+
+    audio.sounds.music = new Audio();
+    audio.sounds.music.src = 'assets/sounds/music.mp3';
+    audio.sounds.music.loop = true;
+    audio.sounds.music.volume = 0.1;
+    
+    if (audio.enabled) {
+        audio.sounds.music.play().catch(e => console.log('Музыка не загружена:', e));
+    }
 }
 
-// Воспроизведение звука
 function playSound(soundName) {
     if (!audio.enabled) return;
     
     const sound = audio.sounds[soundName];
     if (sound) {
-        // Сбрасываем на начало (для быстрого повторения)
-        sound.currentTime = 0;
-        sound.play().catch(e => {
-            // Игнорируем ошибки (например, если звук не загружен)
-            console.log(`Звук ${soundName} не воспроизвёлся:`, e);
-        });
+        const soundClone = sound.cloneNode();
+        soundClone.play().catch(e => console.log('Звук не загружен:', e));
     }
 }
 
-// Включение/выключение звука
 function toggleAudio() {
     audio.enabled = !audio.enabled;
-    console.log(`Звук: ${audio.enabled ? 'ВКЛ' : 'ВЫКЛ'}`);
-}
-
-// Изменение громкости
-function setVolume(value) {
-    audio.volume = Math.max(0, Math.min(1, value));
-    Object.values(audio.sounds).forEach(sound => {
-        sound.volume = audio.volume;
-    });
+    
+    if (audio.enabled) {
+        if (audio.sounds.music) {
+            audio.sounds.music.play().catch(e => console.log('Музыка не загружена:', e));
+        }
+    } else {
+        if (audio.sounds.music) {
+            audio.sounds.music.pause();
+        }
+    }
 }
